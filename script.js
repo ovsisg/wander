@@ -102,6 +102,55 @@ class App {
 
   _newPlace(e) {
     e.preventDefault();
+
+    const type = inputType.value;
+    const location = inputLocation.value.trim();
+    const companion = inputCompanion.value.trim();
+    const rating = +inputRating.value;
+    const plannedDate = inputPlannedDate.value;
+    const { lat, lng } = this.#mapEvent.latlng;
+    let place;
+
+    if (!location) return alert('Please enter a location.');
+
+    if (type === 'visited') {
+      if (!rating || rating < 1 || rating > 5)
+        return alert('Rating must be between 1 and 5.');
+      place = new VisitedPlace([lat, lng], location, companion, rating);
+    }
+
+    if (type === 'planned') {
+      if (!plannedDate) return alert('Please select a planned date.');
+      place = new PlannedPlace([lat, lng], location, companion, plannedDate);
+    }
+
+    this._renderPlaceMarker(place);
+
+    inputLocation.value =
+      inputCompanion.value =
+      inputRating.value =
+      inputPlannedDate.value =
+        '';
+
+    form.classList.add('hidden');
+  }
+
+  _renderPlaceMarker(place) {
+    L.marker(place.coords)
+      .addTo(this.#map)
+      .bindPopup(
+        L.popup({
+          maxWidth: 250,
+          minWidth: 100,
+          autoClose: false,
+          closeOnClick: false,
+          className: `${place.type}-popup`,
+        })
+      )
+      .setPopupContent(
+        `${place.type === 'visited' ? '🌍' : '📍'} ${place.description}`
+      )
+      .openPopup();
   }
 }
 
