@@ -2,8 +2,54 @@
 
 const form = document.querySelector('.form');
 const inputType = document.querySelector('.form__input--type');
+const inputLocation = document.querySelector('.form__input--location');
+const inputCompanion = document.querySelector('.form__input--companion');
 const inputRating = document.querySelector('.form__input--rating');
 const inputPlannedDate = document.querySelector('.form__input--planned-date');
+
+class Place {
+  date = new Date();
+  id = (Date.now() + '').slice(-10);
+
+  constructor(coords, location, visitType) {
+    this.coords = coords;
+    this.location = location;
+    this.visitType = visitType;
+  }
+
+  _setDescription() {
+    // prettier-ignore
+    const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+
+    this.description = `${
+      this.visitType === 'visited' ? 'Visited' : 'Planning to visit'
+    } ${this.location} - ${
+      months[this.date.getMonth()]
+    } ${this.date.getDate()}`;
+  }
+}
+
+class VisitedPlace extends Place {
+  type = 'visited';
+
+  constructor(coords, location, companion, rating) {
+    super(coords, location, 'visited');
+    this.companion = companion;
+    this.rating = rating;
+    this._setDescription();
+  }
+}
+
+class PlannedPlace extends Place {
+  type = 'planned';
+
+  constructor(coords, location, companion, plannedDate) {
+    super(coords, location, 'planned');
+    this.companion = companion;
+    this.plannedDate = plannedDate;
+    this._setDescription();
+  }
+}
 
 class App {
   #map;
