@@ -254,6 +254,11 @@ class App {
       this._renderPlace(place);
     });
   }
+
+  reset() {
+    localStorage.removeItem('places');
+    location.reload();
+  }
 }
 
 const app = new App();
