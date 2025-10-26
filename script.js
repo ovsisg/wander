@@ -1,6 +1,7 @@
 'use strict';
 
 const form = document.querySelector('.form');
+const containerPlaces = document.querySelector('.places');
 const inputType = document.querySelector('.form__input--type');
 const inputLocation = document.querySelector('.form__input--location');
 const inputCompanion = document.querySelector('.form__input--companion');
@@ -55,12 +56,14 @@ class App {
   #map;
   #mapEvent;
   #mapZoomLevel = 13;
+  #places = [];
 
   constructor() {
     this._getPosition();
 
     form.addEventListener('submit', this._newPlace.bind(this));
     inputType.addEventListener('change', this._toggleOptionalFields);
+    containerPlaces.addEventListener('click', this._moveToPopup.bind(this));
   }
 
   _getPosition() {
@@ -123,6 +126,8 @@ class App {
       if (!plannedDate) return alert('Please select a planned date.');
       place = new PlannedPlace([lat, lng], location, companion, plannedDate);
     }
+
+    this.#places.push(place);
 
     this._renderPlaceMarker(place);
     this._renderPlace(place);
@@ -189,6 +194,19 @@ class App {
       `;
 
     form.insertAdjacentHTML('afterend', html);
+  }
+
+  _moveToPopup(e) {
+    const placeEl = e.target.closest('.place');
+    if (!placeEl) return;
+
+    const place = this.#places.find(pl => pl.id === placeEl.dataset.id);
+    if (!place) return;
+
+    this.#map.setView(place.coords, this.#mapZoomLevel, {
+      animate: true,
+      pan: { duration: 1 },
+    });
   }
 }
 
