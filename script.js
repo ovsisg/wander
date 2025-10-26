@@ -57,6 +57,7 @@ class App {
   #mapEvent;
   #mapZoomLevel = 13;
   #places = [];
+  #markers = [];
 
   constructor() {
     this._getLocalStorage();
@@ -145,7 +146,7 @@ class App {
   }
 
   _renderPlaceMarker(place) {
-    L.marker(place.coords)
+    const marker = L.marker(place.coords)
       .addTo(this.#map)
       .bindPopup(
         L.popup({
@@ -160,6 +161,8 @@ class App {
         `${place.type === 'visited' ? '🌍' : '📍'} ${place.description}`
       )
       .openPopup();
+
+    this.#markers.push({ id: place.id, marker });
   }
 
   _renderPlace(place) {
@@ -221,6 +224,12 @@ class App {
     const placeId = placeEl.dataset.id;
 
     this.#places = this.#places.filter(pl => pl.id !== placeId);
+
+    const markerObj = this.#markers.find(m => m.id === placeId);
+    if (markerObj) {
+      this.#map.removeLayer(markerObj.marker);
+      this.#markers = this.#markers.filter(m => m.id !== placeId);
+    }
 
     placeEl.remove();
 
