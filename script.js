@@ -92,6 +92,10 @@ class App {
     }).addTo(this.#map);
 
     this.#map.on('click', this._showForm.bind(this));
+
+    this.#places.forEach(place => {
+      this._renderPlaceMarker(place);
+    });
   }
 
   _showForm(mapE) {
