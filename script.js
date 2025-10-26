@@ -65,6 +65,7 @@ class App {
     form.addEventListener('submit', this._newPlace.bind(this));
     inputType.addEventListener('change', this._toggleOptionalFields);
     containerPlaces.addEventListener('click', this._moveToPopup.bind(this));
+    containerPlaces.addEventListener('click', this._deletePlace.bind(this));
   }
 
   _getPosition() {
@@ -164,6 +165,7 @@ class App {
   _renderPlace(place) {
     let html = `
       <li class="place place--${place.type}" data-id="${place.id}">
+        <div class="place__delete"><span>X</span></div>
         <h2 class="place__title">${place.description}</h2>
         <div class="place__details">
           <span class="place__icon">${
@@ -209,6 +211,20 @@ class App {
       animate: true,
       pan: { duration: 1 },
     });
+  }
+
+  _deletePlace(e) {
+    const deleteBtn = e.target.closest('.place__delete');
+    if (!deleteBtn) return;
+
+    const placeEl = deleteBtn.closest('.place');
+    const placeId = placeEl.dataset.id;
+
+    this.#places = this.#places.filter(pl => pl.id !== placeId);
+
+    placeEl.remove();
+
+    this._setLocalStorage();
   }
 
   _setLocalStorage() {
