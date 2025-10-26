@@ -101,6 +101,19 @@ class App {
   _showForm(mapE) {
     this.#mapEvent = mapE;
     form.classList.remove('hidden');
+    inputLocation.focus();
+  }
+
+  _hideForm() {
+    inputLocation.value =
+      inputCompanion.value =
+      inputRating.value =
+      inputPlannedDate.value =
+        '';
+
+    form.style.display = 'none';
+    form.classList.add('hidden');
+    setTimeout(() => (form.style.display = 'grid'), 1000);
   }
 
   _toggleOptionalFields() {
@@ -139,13 +152,8 @@ class App {
     this._renderPlaceMarker(place);
     this._renderPlace(place);
 
-    inputLocation.value =
-      inputCompanion.value =
-      inputRating.value =
-      inputPlannedDate.value =
-        '';
+    this._hideForm();
 
-    form.classList.add('hidden');
     this._setLocalStorage();
   }
 
