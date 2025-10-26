@@ -59,6 +59,7 @@ class App {
   #places = [];
 
   constructor() {
+    this._getLocalStorage();
     this._getPosition();
 
     form.addEventListener('submit', this._newPlace.bind(this));
@@ -139,6 +140,7 @@ class App {
         '';
 
     form.classList.add('hidden');
+    this._setLocalStorage();
   }
 
   _renderPlaceMarker(place) {
@@ -206,6 +208,21 @@ class App {
     this.#map.setView(place.coords, this.#mapZoomLevel, {
       animate: true,
       pan: { duration: 1 },
+    });
+  }
+
+  _setLocalStorage() {
+    localStorage.setItem('places', JSON.stringify(this.#places));
+  }
+
+  _getLocalStorage() {
+    const data = JSON.parse(localStorage.getItem('places'));
+    if (!data) return;
+
+    this.#places = data;
+
+    this.#places.forEach(place => {
+      this._renderPlace(place);
     });
   }
 }
