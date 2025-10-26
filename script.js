@@ -1,13 +1,5 @@
 'use strict';
 
-const form = document.querySelector('.form');
-const containerPlaces = document.querySelector('.places');
-const inputType = document.querySelector('.form__input--type');
-const inputLocation = document.querySelector('.form__input--location');
-const inputCompanion = document.querySelector('.form__input--companion');
-const inputRating = document.querySelector('.form__input--rating');
-const inputPlannedDate = document.querySelector('.form__input--planned-date');
-
 class Place {
   date = new Date();
   id = (Date.now() + '').slice(-10);
@@ -29,6 +21,14 @@ class Place {
     } ${this.date.getDate()}`;
   }
 }
+
+const form = document.querySelector('.form');
+const containerPlaces = document.querySelector('.places');
+const inputType = document.querySelector('.form__input--type');
+const inputLocation = document.querySelector('.form__input--location');
+const inputCompanion = document.querySelector('.form__input--companion');
+const inputRating = document.querySelector('.form__input--rating');
+const inputPlannedDate = document.querySelector('.form__input--planned-date');
 
 class VisitedPlace extends Place {
   type = 'visited';
@@ -60,8 +60,8 @@ class App {
   #markers = [];
 
   constructor() {
-    this._getLocalStorage();
     this._getPosition();
+    this._getLocalStorage();
 
     form.addEventListener('submit', this._newPlace.bind(this));
     inputType.addEventListener('change', this._toggleOptionalFields);
@@ -74,7 +74,7 @@ class App {
       navigator.geolocation.getCurrentPosition(
         this._loadMap.bind(this),
         function () {
-          alert('Unable to get your location');
+          alert('Unable to get your location.');
         }
       );
   }
@@ -98,18 +98,14 @@ class App {
     });
   }
 
-  _showForm(mapE) {
-    this.#mapEvent = mapE;
+  _showForm(mapEvent) {
+    this.#mapEvent = mapEvent;
     form.classList.remove('hidden');
     inputLocation.focus();
   }
 
   _hideForm() {
-    inputLocation.value =
-      inputCompanion.value =
-      inputRating.value =
-      inputPlannedDate.value =
-        '';
+    inputLocation.value = inputRating.value = inputPlannedDate.value = '';
 
     form.style.display = 'none';
     form.classList.add('hidden');
@@ -117,14 +113,13 @@ class App {
   }
 
   _toggleOptionalFields() {
-    inputPlannedDate
-      .closest('.form__row')
-      .classList.toggle('form__row--hidden');
+    // prettier-ignore
+    inputPlannedDate.closest('.form__row').classList.toggle('form__row--hidden');
     inputRating.closest('.form__row').classList.toggle('form__row--hidden');
   }
 
-  _newPlace(e) {
-    e.preventDefault();
+  _newPlace(event) {
+    event.preventDefault();
 
     const type = inputType.value;
     const location = inputLocation.value.trim();
@@ -151,9 +146,7 @@ class App {
 
     this._renderPlaceMarker(place);
     this._renderPlace(place);
-
     this._hideForm();
-
     this._setLocalStorage();
   }
 
@@ -190,7 +183,9 @@ class App {
         </div>
         <div class="place__details">
           <span class="place__icon">👥</span>
-          <span class="place__value">${place.companion}</span>
+          <span class="place__value">${
+            place.companion === 'myself' ? 'Myself' : 'Others'
+          }</span>
         </div>
     `;
 
@@ -216,10 +211,14 @@ class App {
   }
 
   _moveToPopup(e) {
-    const placeEl = e.target.closest('.place');
-    if (!placeEl) return;
+    const placeElement = e.target.closest('.place');
 
-    const place = this.#places.find(pl => pl.id === placeEl.dataset.id);
+    if (!placeElement) return;
+
+    const place = this.#places.find(
+      place => place.id === placeElement.dataset.id
+    );
+
     if (!place) return;
 
     this.#map.setView(place.coords, this.#mapZoomLevel, {
@@ -228,22 +227,23 @@ class App {
     });
   }
 
-  _deletePlace(e) {
-    const deleteBtn = e.target.closest('.place__delete');
-    if (!deleteBtn) return;
+  _deletePlace(event) {
+    const deleteButton = event.target.closest('.place__delete');
 
-    const placeEl = deleteBtn.closest('.place');
-    const placeId = placeEl.dataset.id;
+    if (!deleteButton) return;
 
-    this.#places = this.#places.filter(pl => pl.id !== placeId);
+    const placeElement = deleteButton.closest('.place');
+    const placeId = placeElement.dataset.id;
 
-    const markerObj = this.#markers.find(m => m.id === placeId);
-    if (markerObj) {
-      this.#map.removeLayer(markerObj.marker);
-      this.#markers = this.#markers.filter(m => m.id !== placeId);
+    this.#places = this.#places.filter(place => place.id !== placeId);
+
+    const markerObject = this.#markers.find(marker => marker.id === placeId);
+    if (markerObject) {
+      this.#map.removeLayer(markerObject.marker);
+      this.#markers = this.#markers.filter(marker => marker.id !== placeId);
     }
 
-    placeEl.remove();
+    placeElement.remove();
 
     this._setLocalStorage();
   }
@@ -254,6 +254,7 @@ class App {
 
   _getLocalStorage() {
     const data = JSON.parse(localStorage.getItem('places'));
+
     if (!data) return;
 
     this.#places = data;
