@@ -125,6 +125,7 @@ class App {
     }
 
     this._renderPlaceMarker(place);
+    this._renderPlace(place);
 
     inputLocation.value =
       inputCompanion.value =
@@ -151,6 +152,43 @@ class App {
         `${place.type === 'visited' ? '🌍' : '📍'} ${place.description}`
       )
       .openPopup();
+  }
+
+  _renderPlace(place) {
+    let html = `
+      <li class="place place--${place.type}" data-id="${place.id}">
+        <h2 class="place__title">${place.description}</h2>
+        <div class="place__details">
+          <span class="place__icon">${
+            place.type === 'visited' ? '🌍' : '📍'
+          }</span>
+          <span class="place__value">${place.location}</span>
+        </div>
+        <div class="place__details">
+          <span class="place__icon">👥</span>
+          <span class="place__value">${place.companion}</span>
+        </div>
+    `;
+
+    if (place.type === 'visited')
+      html += `
+        <div class="place__details">
+          <span class="place__icon">⭐</span>
+          <span class="place__value">${place.rating}</span>
+        </div>
+      </li>
+      `;
+
+    if (place.type === 'planned')
+      html += `
+        <div class="place__details">
+          <span class="place__icon">📅</span>
+          <span class="place__value">${place.plannedDate}</span>
+        </div>
+      </li>
+      `;
+
+    form.insertAdjacentHTML('afterend', html);
   }
 }
 
